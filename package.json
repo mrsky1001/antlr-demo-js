@@ -2,14 +2,17 @@
   "name": "antlr-demo-js",
   "version": "1.0.0",
   "description": "",
-  "main": "index.js",
+  "main": "src/demo.js",
   "scripts": {
+    "start": "node src/demo.js",
     "compile": "sh src/build.sh",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
-  "author": "mr.sky1001",
+  "author": "Nikita Kolyada <nikita.nk16@yandex.ru>",
   "license": "ISC",
   "dependencies": {
-    "antlr4": "^4.8.0"
+    "antlr4": "^4.8.0",
+    "fs": "0.0.1-security",
+    "util": "^0.12.3"
   }
 }
