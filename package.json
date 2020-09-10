@@ -1,0 +1,15 @@
+{
+  "name": "antlr-demo-js",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "compile": "sh src/build.sh",
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": "mr.sky1001",
+  "license": "ISC",
+  "dependencies": {
+    "antlr4": "^4.8.0"
+  }
+}
