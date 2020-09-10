@@ -2,10 +2,11 @@ const antlr4 = require('antlr4');
 const ECMAScriptLexer = require('../lib/ECMAScriptLexer.js');
 const ECMAScriptParser = require('../lib/ECMAScriptParser.js');
 const PythonGenerator = require("./codegeneration/PythonGenerator");
+const ErrorListener = require('./codegeneration/ErrorListener.js');
 const fs = require('fs');
 const util = require('util');
 
-const input = '{x: 1}';
+const input = '{x: 2}';
 
 const chars = new antlr4.InputStream(input);
 const lexer = new ECMAScriptLexer.ECMAScriptLexer(chars);
@@ -14,21 +15,29 @@ lexer.strictMode = false; // не использовать JavaScript strictMode
 
 const tokens = new antlr4.CommonTokenStream(lexer);
 const parser = new ECMAScriptParser.ECMAScriptParser(tokens);
-const tree = parser.program();
+const listener = new ErrorListener();
 
-// console.log(tree.toStringTree(parser.ruleNames));
+parser.removeErrorListeners();
+parser.addErrorListener(listener);
 
 console.log('JavaScript input:');
 console.log(input);
 console.log('Python output:');
 
-const output = new PythonGenerator().start(tree);
+try {
+    const tree = parser.expressionSequence();
+    const output = new PythonGenerator().start(tree);
 
-fs.open('dist/output.txt', 'w', (err, fd) => {
+    console.log(output);
 
-    fs.write(fd, output);
-    fs.close(fd);
-});
+    fs.open('dist/output.txt', 'w', (err, fd) => {
 
-console.log( new PythonGenerator().visitTerminal(tree));
-console.log(output);
+        fs.write(fd, output);
+        fs.close(fd);
+    });
+
+    // console.log(tree.toStringTree(parser.ruleNames));
+} catch (error) {
+    console.log(error);
+}
+

@@ -1,3 +1,5 @@
+gen/
+dist/
 lib/
 .idea/
 package-lock.json

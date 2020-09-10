@@ -1,4 +1,9 @@
 const ECMAScriptVisitor = require('../../lib/ECMAScriptVisitor.js').ECMAScriptVisitor;
+const path = require('path');
+const {
+    SemanticArgumentCountMismatchError
+} = require(path.resolve('src/error', 'helper'));
+
 
 /**
  * Visitor проходит по дереву, сгенерированному ANTLR
@@ -53,7 +58,7 @@ class Visitor extends ECMAScriptVisitor {
         const key = this.visit(ctx.propertyName());
         const value = this.visit(ctx.singleExpression());
 
-        // Текстовое значение узла
+        // // Текстовое значение узла
         console.log(ctx.getText());
         // Кол-во узлов потомков
         console.log(ctx.getChildCount());
@@ -64,6 +69,55 @@ class Visitor extends ECMAScriptVisitor {
         // console.log(ctx.singleExpression().getText()) Значение 1
         console.log(ctx.getChild(2).getText());
         return "'${key}': ${value}";
+    }
+
+    /**
+     * Удаляет ключевое слово `new`
+     *
+     * @param {object} ctx
+     * @returns {string}
+     */
+    visitNewExpression(ctx) {
+        return this.visit(ctx.singleExpression());
+    }
+
+
+    /**
+     * Посещает узел с ключевым словом `Number`
+     *
+     * @param {object} ctx
+     * @returns {string}
+     */
+    visitNumberExpression(ctx) {
+        const argumentList = ctx.arguments().argumentList();
+
+        if (argumentList === null || argumentList.getChildCount() !== 1) {
+            throw new SemanticArgumentCountMismatchError();
+        }
+
+        const arg = argumentList.singleExpression()[0];
+        const number = this.removeQuotes(this.visit(arg));
+
+        return `int(${number})`;
+    }
+
+    /**
+     * Удаляет символы кавычек в начале и в конце строки
+     *
+     * @param {String} str
+     * @returns {String}
+     */
+    removeQuotes(str) {
+        let newStr = str;
+
+        if (
+            (str.charAt(0) === '"' && str.charAt(str.length - 1) === '"') ||
+            (str.charAt(0) === '\'' && str.charAt(str.length - 1) === '\'')
+        ) {
+            newStr = str.substr(1, str.length - 2);
+        }
+
+        return newStr;
     }
 }
 
